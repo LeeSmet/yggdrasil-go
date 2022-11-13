@@ -69,6 +69,11 @@ func (l *linkTLS) dial(url *url.URL, options linkOptions, sintf, sni string) err
 	if err != nil {
 		return err
 	}
+	if tlsconn, ok := conn.(*tls.Conn); ok {
+		if netconn, ok := tlsconn.NetConn().(*net.TCPConn); ok {
+			_ = netconn.SetNoDelay(true)
+		}
+	}
 	name := strings.TrimRight(strings.SplitN(url.String(), "?", 2)[0], "/")
 	dial := &linkDial{
 		url:   url,
@@ -108,6 +113,11 @@ func (l *linkTLS) listen(url *url.URL, sintf string) (*Listener, error) {
 			if err != nil {
 				cancel()
 				break
+			}
+			if tlsconn, ok := conn.(*tls.Conn); ok {
+				if netconn, ok := tlsconn.NetConn().(*net.TCPConn); ok {
+					_ = netconn.SetNoDelay(true)
+				}
 			}
 			laddr := conn.LocalAddr().(*net.TCPAddr)
 			raddr := conn.RemoteAddr().(*net.TCPAddr)

@@ -47,6 +47,10 @@ func (l *linkTCP) dial(url *url.URL, options linkOptions, sintf string) error {
 	if err != nil {
 		return err
 	}
+	if netconn, ok := conn.(*net.TCPConn); ok {
+		_ = netconn.SetNoDelay(true)
+	}
+	_ = conn.(*net.TCPConn).SetNoDelay(true)
 	name := strings.TrimRight(strings.SplitN(url.String(), "?", 2)[0], "/")
 	dial := &linkDial{
 		url:   url,
@@ -85,6 +89,9 @@ func (l *linkTCP) listen(url *url.URL, sintf string) (*Listener, error) {
 			if err != nil {
 				cancel()
 				break
+			}
+			if netconn, ok := conn.(*net.TCPConn); ok {
+				_ = netconn.SetNoDelay(true)
 			}
 			laddr := conn.LocalAddr().(*net.TCPAddr)
 			raddr := conn.RemoteAddr().(*net.TCPAddr)

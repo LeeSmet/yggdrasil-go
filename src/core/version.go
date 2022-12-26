@@ -10,7 +10,7 @@ import "crypto/ed25519"
 // It must always begin with the 4 bytes "meta" and a wire formatted uint64 major version number.
 // The current version also includes a minor version number, and the box/sig/link keys that need to be exchanged to open a connection.
 type version_metadata struct {
-	meta [4]byte
+	meta [5]byte
 	ver  uint8 // 1 byte in this version
 	// Everything after this point potentially depends on the version number, and is subject to change in future versions
 	minorVer uint8 // 1 byte in this version
@@ -20,7 +20,7 @@ type version_metadata struct {
 // Gets a base metadata with no keys set, but with the correct version numbers.
 func version_getBaseMetadata() version_metadata {
 	return version_metadata{
-		meta:     [4]byte{'m', 'e', 't', 'a'},
+		meta:     [5]byte{'t', 'f', 'n', 'e', 't'},
 		ver:      0,
 		minorVer: 4,
 	}
@@ -28,7 +28,7 @@ func version_getBaseMetadata() version_metadata {
 
 // Gets the length of the metadata for this version, used to know how many bytes to read from the start of a connection.
 func version_getMetaLength() (mlen int) {
-	mlen += 4                     // meta
+	mlen += 5                     // meta
 	mlen++                        // ver, as long as it's < 127, which it is in this version
 	mlen++                        // minorVer, as long as it's < 127, which it is in this version
 	mlen += ed25519.PublicKeySize // key
